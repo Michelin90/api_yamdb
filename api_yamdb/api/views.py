@@ -1,6 +1,7 @@
-from rest_framework import viewsets, mixins
-from serializers import (CategorySerializer, )
-from reviews.models import Category
+from rest_framework import viewsets, mixins, filters
+from serializers import (CategorySerializer,
+                         GenreSerializer)
+from reviews.models import Category, Genre
 
 
 class CategoryViewSet(mixins.ListModelMixin,
@@ -9,3 +10,13 @@ class CategoryViewSet(mixins.ListModelMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class GenreViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('^name', )
