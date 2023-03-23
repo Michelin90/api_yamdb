@@ -4,7 +4,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from .permissions import IsBossOrReadOnlyPermission
 from .serializers import CommentSerializer
-from reviews.models import Review
+from ..reviews.models import Review
+
 
 class CommentViewSet(ModelViewSet):
     permission_classes = [
