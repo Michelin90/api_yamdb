@@ -1,13 +1,16 @@
-from rest_framework import viewsets, status
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
-from .serializers import UserSerializer
-from reviews.models import User
+from .serializers import CommentSerializer, UserSerializer
+from .permissions import IsBossOrReadOnlyPermission
+from reviews.models import Review, User 
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = 'username'
@@ -33,3 +36,22 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        IsBossOrReadOnlyPermission,
+    ]
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'))
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
