@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .serializers import CommentSerializer, UserSerializer
 from .permissions import IsBossOrReadOnlyPermission
-from reviews.models import Review, User 
+from reviews.models import Review, User
 
 
 class UserViewSet(ModelViewSet):
@@ -38,7 +38,7 @@ class UserViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(ModelViewSet):
     permission_classes = [
         IsBossOrReadOnlyPermission,
     ]
