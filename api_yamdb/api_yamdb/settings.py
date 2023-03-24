@@ -23,8 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'reviews',
-    'api.apps.ApiConfig',
-    'reviews.apps.ReviewsConfig',
 ]
 
 MIDDLEWARE = [
