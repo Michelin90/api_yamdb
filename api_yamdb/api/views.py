@@ -16,14 +16,20 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
-        permission_classes=[IsAuthenticated],
+        permission_classes=(IsAuthenticated,),
     )
     def me(self, request):
         if request.method == 'PATCH':
-            serializer = UserSerializer(request.user, data=request.data)
+            serializer = UserSerializer(
+                request.user,
+                data=request.data,
+                partial=True,
+            )
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
