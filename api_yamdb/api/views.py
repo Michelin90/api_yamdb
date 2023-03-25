@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404
 
+from rest_framework import mixins, viewsets
 from rest_framework.viewsets import ModelViewSet
 
 from .permissions import IsBossOrReadOnlyPermission
-from .serializers import CommentSerializer
-from ..reviews.models import Review
+from .serializers import CategorySerializer, CommentSerializer
+from ..reviews.models import Review, Category
 
 
 class CommentViewSet(ModelViewSet):
@@ -24,3 +25,11 @@ class CommentViewSet(ModelViewSet):
             Review,
             id=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
+
+class CategoryViewSet(mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
