@@ -1,10 +1,9 @@
-from rest_framework import viewsets, mixins, filters
+from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from serializers import (CategorySerializer,
-                         GenreSerializer,
-                         TitleSerializer)
+from rest_framework import filters, mixins, viewsets
 
 from reviews.models import Category, Genre, Title
+from serializers import CategorySerializer, GenreSerializer, TitleSerializer
 
 
 class CategoryViewSet(mixins.ListModelMixin,
@@ -31,7 +30,9 @@ class TitleViewSet(mixins.ListModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    ).all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend, )
     filterset_fields = ('category', 'genre', 'name', 'year')
