@@ -4,6 +4,7 @@ from rest_framework import filters, mixins, viewsets
 
 from reviews.models import Category, Genre, Title
 from serializers import CategorySerializer, GenreSerializer, TitleSerializer
+from permissions import AdminOrReadOnlyPermission
 
 
 class CategoryViewSet(mixins.ListModelMixin,
@@ -24,15 +25,11 @@ class GenreViewSet(mixins.ListModelMixin,
     search_fields = ('^name', )
 
 
-class TitleViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   mixins.RetrieveAPIView,
-                   mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend, )
     filterset_fields = ('category', 'genre', 'name', 'year')
+    permissions = AdminOrReadOnlyPermission
