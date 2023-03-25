@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Comment
+from reviews.models import User, Comment
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'role')
+    search_fields = ('uesrname',)
+    list_filter = ('role',)
+    empty_value_display = '-пусто-'
 
 
 @admin.register(Comment)
