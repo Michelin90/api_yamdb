@@ -1,6 +1,7 @@
-from rest_framework import viewsets, mixins
-from serializers import (CategorySerializer, )
+from rest_framework import mixins, viewsets
+
 from reviews.models import Category
+from serializers import (CategorySerializer, )
 
 
 class CategoryViewSet(mixins.ListModelMixin,
