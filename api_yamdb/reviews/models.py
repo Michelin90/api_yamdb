@@ -3,8 +3,8 @@ from django.db import models
 from django.db.models.base import ModelBase
 
 
-User = ModelBase('User', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
-Review = ModelBase('Post', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
+User = ModelBase('User', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'Review'})
+Review = ModelBase('Review', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'Review'})
 
 
 class Comment(models.Model):
@@ -20,7 +20,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='отзыв'
     )
-    text = models.TextField()
+    text = models.TextField(max_length=500)
     created = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True,
