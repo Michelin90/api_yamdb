@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from django.db.models.base import ModelBase
+Review = ModelBase('Post', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
 
 class User(AbstractUser):
     USER = 'user'
