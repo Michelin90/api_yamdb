@@ -130,3 +130,5 @@ EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 2525
 EMAIL_HOST_USER = 'michelin_90@mail.ru'
 EMAIL_HOST_PASSWORD = 'U5ppZ7X6aVaRarAdAJUn'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

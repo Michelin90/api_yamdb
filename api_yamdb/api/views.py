@@ -42,22 +42,24 @@ class UserViewSet(ModelViewSet):
 
 
 class SignupView(views.APIView):
-    permission_classes = (AllowAny,)
-    
+
     def post(self, request):
-        serializer = SignupSerializer(data=request.daata)
+        serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            # user = get_object_or_404(User, username=request.data['username'])
-            # confirmation_code = code_generation()
-            # user.confirmation_code = confirmation_code
-            # user.save()
-            # send_mail(
-            #     'Код подтверждения',
-            #     message=confirmation_code,
-            #     from_email=settings.EMAIL_HOST_USER,
-            #     recipient_list=[user.email]
-            # )
+            user = get_object_or_404(
+                User, username=request.data.get('username')
+            )
+            confirmation_code = code_generation()
+            user.confirmation_code = confirmation_code
+            user.save()
+            send_mail(
+                subject='Код подтверждения',
+                message=confirmation_code,
+                recipient_list=[user.email],
+                from_email=settings.EMAIL_HOST_USER,
+                fail_silently=False,
+            )
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
