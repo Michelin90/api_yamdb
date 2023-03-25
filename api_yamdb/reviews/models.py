@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.db.models.base import ModelBase
 User = ModelBase('User', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
 Review = ModelBase('Post', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
@@ -49,3 +50,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=200,
+                            unique=True,
+                            verbose_name="Название")
+    slug = models.SlugField(unique=True,
+                            verbose_name="Метка",)
+
+    def __str__(self):
+        return self.name
