@@ -3,11 +3,12 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import mixins, viewsets
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import CommentSerializer, UserSerializer
+from .serializers import CommentSerializer, UserSerializer, CategorySerializer
 from .permissions import IsBossOrReadOnlyPermission
-from reviews.models import Review, User
+from reviews.models import Review, User, Category
 
 
 class UserViewSet(ModelViewSet):
@@ -55,3 +56,11 @@ class CommentViewSet(ModelViewSet):
             Review,
             id=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
+
+class CategoryViewSet(mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer

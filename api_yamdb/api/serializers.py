@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from reviews.models import User, Comment
+from reviews.models import User, Comment, Category
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data['username'] == 'me':
             raise serializers.ValidationError('Недопустимое имя!')
-        return data
+        return data, Category
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -28,3 +28,9 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Comment
 
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
