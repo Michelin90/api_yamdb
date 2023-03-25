@@ -3,14 +3,15 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import status, views
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import mixins, viewsets
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import(
-  CategorySerializer, CommentSerializer, UserSerializer, SignupSerializer
-)
+from .serializers import (CategorySerializer,
+                          CommentSerializer,
+                          UserSerializer,
+                          SignupSerializer)
 from .permissions import IsBossOrReadOnlyPermission
 from .utils import code_generation
 from reviews.models import Category, Review, User
