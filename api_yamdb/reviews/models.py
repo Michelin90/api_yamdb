@@ -11,7 +11,11 @@ class User(AbstractUser):
         (MODERATOR, 'модератор'),
         (ADMIN, 'админ'),
     ]
-    email = models.EmailField(unique=True)
+    email = models.EmailField(
+        'Адрес электронной почты',
+        max_length=254,
+        unique=True
+    )
     bio = models.TextField(
         'Биография',
         blank=True,
