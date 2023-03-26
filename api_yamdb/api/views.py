@@ -31,6 +31,7 @@ class CategoryViewSet(mixins.ListModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
+    permission_class = AdminOrReadOnlyPermission
 
 
 class CommentViewSet(ModelViewSet):
@@ -61,7 +62,7 @@ class GenreViewSet(mixins.ListModelMixin,
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
-    permission_classes = (AdminOrReadOnlyPermission,)
+    permission_class = AdminOrReadOnlyPermission
     pagination_class = PageNumberPagination
 
 
