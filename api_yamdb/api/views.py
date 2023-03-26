@@ -1,6 +1,7 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
 
 from rest_framework import settings, status, views
 from rest_framework.decorators import action
@@ -14,12 +15,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from reviews.models import Category, Genre, Review, Title, User
 from .permissions import AdminOrReadOnlyPermission, IsBossOrReadOnlyPermission
 from .serializers import (CategorySerializer,
-                         CommentSerializer,
-                         GenreSerializer,
-                         ReviewSerializer,
-                         SignupSerializer,
-                         TitleSerializer,
-                         UserSerializer,)
+                          CommentSerializer,
+                          GenreSerializer,
+                          ReviewSerializer,
+                          SignupSerializer,
+                          TitleSerializer,
+                          UserSerializer,)
 from .utils import code_generation
 
 
