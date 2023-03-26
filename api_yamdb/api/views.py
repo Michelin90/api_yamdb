@@ -1,14 +1,36 @@
 from django.shortcuts import get_object_or_404
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import mixins, viewsets
+from rest_framework import viewsets, mixins, filters
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import CommentSerializer, UserSerializer, CategorySerializer
+from serializers import (CategorySerializer,
+                         CommentSerializer,
+                         GenreSerializer,
+                         UserSerializer,)
+from reviews.models import Category, Genre, Rewiew, User
 from .permissions import IsBossOrReadOnlyPermission
-from reviews.models import Review, User, Category
+
+
+class CategoryViewSet(mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class GenreViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('^name', )
 
 
 class UserViewSet(ModelViewSet):

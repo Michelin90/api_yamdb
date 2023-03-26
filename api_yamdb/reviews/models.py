@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from django.db.models.base import ModelBase
+User = ModelBase('User', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
+Review = ModelBase('Post', (models.Model,), {'__module__': 'reviews.models', 'app_label': 'your_app'})
+
 
 class User(AbstractUser):
     USER = 'user'
@@ -43,6 +47,24 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == 'moderator'
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=200,
+                            unique=True)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=200,
+                            unique=True)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Comment(models.Model):
