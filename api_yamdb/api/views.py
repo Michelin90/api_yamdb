@@ -2,14 +2,13 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import status, views
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status, views, viewsets, mixins, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import viewsets, mixins, filters
 from rest_framework.viewsets import ModelViewSet
-from django_filters.rest_framework import DjangoFilterBackend
-
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import Category, Genre, Review, Title, User
 from .permissions import AdminOrReadOnlyPermission, IsBossOrReadOnlyPermission
@@ -19,6 +18,7 @@ from .serializers import (CategorySerializer,
                           ReviewSerializer,
                           SignupSerializer,
                           TitleSerializer,
+                          TokenSerializer,
                           UserSerializer,)
 from .utils import code_generation
 
@@ -108,6 +108,23 @@ class SignupView(views.APIView):
                 fail_silently=False,
             )
             return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TokenView(views.APIView):
+
+    def post(self, request):
+        serializer = TokenSerializer(data=request.data)
+        if serializer.is_valid():
+            user = get_object_or_404(
+                User, username=request.data.get('username')
+            )
+            if request.data.get('confirmation_code') == user.confirmation_code:
+                refresh = RefreshToken.for_user(user)
+                return Response({'token': str(refresh.access_token), })
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
