@@ -4,8 +4,13 @@ from reviews.models import User, Comment
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'role')
-    search_fields = ('uesrname',)
+    list_display = (
+        'username',
+        'email',
+        'role',
+        'confirmation_code',
+    )
+    search_fields = ('username',)
     list_filter = ('role',)
     empty_value_display = '-пусто-'
 
