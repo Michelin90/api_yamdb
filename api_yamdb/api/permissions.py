@@ -13,7 +13,6 @@ class IsBossOrReadOnlyPermission(permissions.BasePermission):
                 or obj.author == request.user
                 or request.user.is_moderator
                 or request.user.is_admin)
-from rest_framework import permissions
 
 
 class AdminOrReadOnlyPermission(permissions.BasePermission):
