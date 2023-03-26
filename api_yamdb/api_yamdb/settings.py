@@ -121,3 +121,14 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+
+# smpt server
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = 'michelin_90@mail.ru'
+EMAIL_HOST_PASSWORD = 'U5ppZ7X6aVaRarAdAJUn'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

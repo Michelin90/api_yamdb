@@ -1,7 +1,6 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-
-from rest_framework import status
+from rest_framework import status, views
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -15,7 +14,6 @@ from .permissions import AdminOrReadOnlyPermission, IsBossOrReadOnlyPermission
 from .serializers import (CategorySerializer,
                          CommentSerializer,
                          GenreSerializer,
-                         ReviewSerializer,
                          TitleSerializer,
                          UserSerializer,)
 
@@ -85,12 +83,35 @@ class UserViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
+class SignupView(views.APIView):
+
+    def post(self, request):
+        serializer = SignupSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            user = get_object_or_404(
+                User, username=request.data.get('username')
+            )
+            confirmation_code = code_generation()
+            user.confirmation_code = confirmation_code
+            user.save()
+            send_mail(
+                subject='Код подтверждения',
+                message=confirmation_code,
+                recipient_list=[user.email],
+                from_email=settings.EMAIL_HOST_USER,
+                fail_silently=False,
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
     serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend, )
+    filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
     permissions = AdminOrReadOnlyPermission
 

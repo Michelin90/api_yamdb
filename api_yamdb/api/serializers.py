@@ -50,18 +50,31 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
 
     class Meta:
         model = User
         fields = [
             'username', 'first_name', 'last_name',
-            'bio', 'role'
+            'bio', 'role', 'email'
         ]
 
     def validate(self, data):
         if data['username'] == 'me':
             raise serializers.ValidationError('Недопустимое имя!')
-        return data, Category
+        return data
+
+
+class SignupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('Недопустимое имя!')
+        return data
 
 
 class ReviewSerializer(serializers.ModelSerializer):
