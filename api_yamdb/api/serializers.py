@@ -9,28 +9,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = ('name', 'slug')
-
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = [
-            'username', 'first_name', 'last_name',
-            'bio', 'role'
-        ]
-
-    def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError('Недопустимое имя!')
-        return data, Category
-
-
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     review = serializers.SlugRelatedField(
@@ -43,14 +21,15 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Category
+        model = Genre
         fields = ('name', 'slug')
 
+
 class TitleSerializer(serializers.ModelSerializer):
-        category = serializers.SlugRelatedField(
+    category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all()
     )
@@ -67,3 +46,18 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            'username', 'first_name', 'last_name',
+            'bio', 'role'
+        ]
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('Недопустимое имя!')
+        return data, Category
