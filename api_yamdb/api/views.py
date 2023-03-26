@@ -9,13 +9,15 @@ from rest_framework import viewsets, mixins, filters
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
-from serializers import (CategorySerializer,
-                         CommentSerializer,
-                         GenreSerializer,
-                         TitleSerializer,
-                         UserSerializer,)
+
 from reviews.models import Category, Genre, Review, Title, User
 from .permissions import AdminOrReadOnlyPermission, IsBossOrReadOnlyPermission
+from .serializers import (CategorySerializer,
+                         CommentSerializer,
+                         GenreSerializer,
+                         ReviewSerializer,
+                         TitleSerializer,
+                         UserSerializer,)
 
 
 class CategoryViewSet(mixins.ListModelMixin,
@@ -91,3 +93,20 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     filterset_fields = ('category', 'genre', 'name', 'year')
     permissions = AdminOrReadOnlyPermission
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (IsBossOrReadOnlyPermission,)
+
+    def get_queryset(self):
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)

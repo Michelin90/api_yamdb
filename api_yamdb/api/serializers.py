@@ -1,5 +1,9 @@
+from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
-from reviews.models import Category, Comment, Genre, Title, User
+
+from reviews.models import Category, Comment, Genre, Title, User, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -38,10 +42,7 @@ class TitleSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Genre.objects.all()
     )
-    description = serializers.SlugRelatedField(
-        slug_field='slug',
-        required=False
-    )
+    description = serializers.CharField(required=False)
 
     class Meta:
         model = Title
@@ -61,3 +62,34 @@ class UserSerializer(serializers.ModelSerializer):
         if data['username'] == 'me':
             raise serializers.ValidationError('Недопустимое имя!')
         return data, Category
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    title = serializers.SlugRelatedField(
+        slug_field='name',
+        read_only=True
+    )
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    def validate(self, data):
+        request = self.context['request']
+        author = request.user
+        title_id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        if (request.method == 'POST'
+           and title.reviews.filter(author=author).exists()):
+            raise ValidationError('Можно оставить только один отзыв!')
+        return data
+
+    def validate_score(self, value):
+        if not 1 <= value <= 10:
+            raise serializers.ValidationError(
+                'Допускается оценка только от 1 до 10!')
+        return value
+
+    class Meta:
+        fields = '__all__'
+        model = Review
