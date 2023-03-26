@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data['username'] == 'me':
             raise serializers.ValidationError('Недопустимое имя!')
-        return data, Category
+        return data
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -40,7 +40,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
-        
+
 
 class CategorySerializer(serializers.ModelSerializer):
 

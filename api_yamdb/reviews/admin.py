@@ -6,11 +6,11 @@ from reviews.models import User, Comment
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'username',
-        'email', 
+        'email',
         'role',
         'confirmation_code',
     )
-    search_fields = ('uesrname',)
+    search_fields = ('username',)
     list_filter = ('role',)
     empty_value_display = '-пусто-'
 
