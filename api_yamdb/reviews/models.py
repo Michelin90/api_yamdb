@@ -77,9 +77,9 @@ class Title(models.Model):
     description = models.CharField(max_length=400,
                                    blank=True,
                                    null=True)
-    genre = models.ForeignKey(Genre,
-                              on_delete=models.CASCADE,
-                              related_name='titles')
+    genre = models.ManyToManyField(Genre,
+                                   related_name='titles',
+                                   )
 
     def __str__(self):
         return self.name
@@ -97,6 +97,7 @@ class GenreTitle(models.Model):
 class Review(models.Model):
     title = models.ForeignKey(
         Title,
+        blank=True,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение'
@@ -132,7 +133,7 @@ class Review(models.Model):
                 fields=('title', 'author'),
                 name='unique review'
             )]
-        ordering = ('pub_date',)
+        ordering = ('pub_date', )
 
     def __str__(self):
         return self.text
