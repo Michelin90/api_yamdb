@@ -3,15 +3,17 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import settings, status, views, viewsets, mixins, filters
+from rest_framework import status, views, viewsets, mixins, filters
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import Category, Genre, Review, Title, User
-from .permissions import AdminOrReadOnlyPermission, IsBossOrReadOnlyPermission
+from .permissions import (AdminOrReadOnlyPermission,
+                          IsBossOrReadOnlyPermission,
+                          AdminPermission)
 from .serializers import (CategorySerializer,
                           CommentSerializer,
                           GenreSerializer,
@@ -64,7 +66,7 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = 'username'
-    permission_classes = (IsAdminUser,)
+    permission_classes = (AdminPermission,)
 
     @action(
         methods=['GET', 'PATCH'],
@@ -79,7 +81,9 @@ class UserViewSet(ModelViewSet):
                 partial=True,
             )
             if serializer.is_valid():
+                serializer.validated_data['role'] = request.user.role
                 serializer.save()
+
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST

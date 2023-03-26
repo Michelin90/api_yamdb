@@ -29,7 +29,7 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(
         'Код подтверждения',
-        max_length=100,
+        max_length=10,
         null=True,
         blank=True,
     )
