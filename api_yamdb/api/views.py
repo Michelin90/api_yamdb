@@ -5,7 +5,8 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, views, viewsets, mixins, filters
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -31,6 +32,8 @@ class CategoryViewSet(mixins.ListModelMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    permission_class = AdminOrReadOnlyPermission
 
 
 class CommentViewSet(ModelViewSet):
@@ -38,6 +41,7 @@ class CommentViewSet(ModelViewSet):
         IsBossOrReadOnlyPermission,
     ]
     serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         review = get_object_or_404(
@@ -60,6 +64,8 @@ class GenreViewSet(mixins.ListModelMixin,
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
+    permission_class = AdminOrReadOnlyPermission
+    pagination_class = PageNumberPagination
 
 
 class UserViewSet(ModelViewSet):
@@ -67,6 +73,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     lookup_field = 'username'
     permission_classes = (AdminPermission,)
+    pagination_class = PageNumberPagination
 
     @action(
         methods=['GET', 'PATCH'],
@@ -140,11 +147,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
     permissions = AdminOrReadOnlyPermission
+    pagination_class = PageNumberPagination
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsBossOrReadOnlyPermission,)
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         title = get_object_or_404(
