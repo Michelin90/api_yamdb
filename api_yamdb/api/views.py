@@ -3,11 +3,11 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from rest_framework import settings, status, views
+from rest_framework import filters, mixins, status, views, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import viewsets, mixins, filters
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -59,6 +59,7 @@ class GenreViewSet(mixins.ListModelMixin,
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
+    pagination_class = PageNumberPagination
 
 
 class UserViewSet(ModelViewSet):
