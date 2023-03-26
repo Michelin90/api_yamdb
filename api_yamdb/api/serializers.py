@@ -1,7 +1,5 @@
 from rest_framework import serializers
-
-from reviews.models import Category, Genre, Title
-
+from reviews.models import Category, Comment, Genre, Title, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -18,8 +16,41 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            'username', 'first_name', 'last_name',
+            'bio', 'role'
+        ]
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('Недопустимое имя!')
+        return data, Category
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    review = serializers.SlugRelatedField(
+        slug_field='title',
+        read_only=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
 class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
+        category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all()
     )
