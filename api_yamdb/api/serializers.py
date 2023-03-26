@@ -1,6 +1,5 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Title, User, Review
@@ -75,6 +74,14 @@ class SignupSerializer(serializers.ModelSerializer):
         if data['username'] == 'me':
             raise serializers.ValidationError('Недопустимое имя!')
         return data
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150)
+
+    class Meta:
+        model = User
+        fields = ['username', 'confirmation_code']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
