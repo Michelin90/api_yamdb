@@ -36,6 +36,7 @@ class CategoryViewSet(mixins.ListModelMixin,
     filter_backends = (filters.SearchFilter, )
     search_fields = ('=name',)
     permission_classes = (AdminOrReadOnlyPermission, )
+    lookup_field = 'slug'
 
 
 class CommentViewSet(ModelViewSet):
@@ -68,6 +69,7 @@ class GenreViewSet(mixins.ListModelMixin,
     search_fields = ('^name', )
     pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnlyPermission,)
+    lookup_field = 'slug'
 
 
 class UserViewSet(ModelViewSet):
