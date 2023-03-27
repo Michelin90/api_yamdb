@@ -72,7 +72,9 @@ class Title(models.Model):
                             unique=True)
     year = models.PositiveSmallIntegerField()
     category = models.ForeignKey(Category,
-                                 on_delete=models.CASCADE,
+                                 on_delete=models.SET_NULL,
+                                 blank=True,
+                                 null=True,
                                  related_name='titles')
     description = models.CharField(max_length=400,
                                    blank=True,

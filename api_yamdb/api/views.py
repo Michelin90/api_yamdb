@@ -142,11 +142,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
+    serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
     permission_classes = [AdminOrReadOnlyPermission]
     pagination_class = PageNumberPagination
-    serializer_class = TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
