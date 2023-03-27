@@ -33,9 +33,9 @@ class CategoryViewSet(mixins.ListModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    permission_class = AdminOrReadOnlyPermission
     filter_backends = (filters.SearchFilter, )
     search_fields = ('=name',)
+    permission_classes = (AdminOrReadOnlyPermission, )
 
 
 class CommentViewSet(ModelViewSet):
@@ -67,6 +67,7 @@ class GenreViewSet(mixins.ListModelMixin,
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
     pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnlyPermission,)
 
 
 class UserViewSet(ModelViewSet):
@@ -142,8 +143,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend, )
     filterset_fields = ('category', 'genre', 'name', 'year')
-    permissions = (AdminOrReadOnlyPermission, )
     pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnlyPermission, )
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
