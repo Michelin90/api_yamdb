@@ -71,9 +71,13 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = 'username'
+    filter_backends = (filters.SearchFilter,)
     permission_classes = (AdminPermission,)
     pagination_class = PageNumberPagination
     search_fields = ('username', )
+    http_method_names = [
+        'get', 'post', 'patch', 'head', 'delete',
+    ]
 
     @action(
         methods=['GET', 'PATCH'],
@@ -90,7 +94,6 @@ class UserViewSet(ModelViewSet):
             if serializer.is_valid():
                 serializer.validated_data['role'] = request.user.role
                 serializer.save()
-
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
