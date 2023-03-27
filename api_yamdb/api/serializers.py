@@ -47,8 +47,6 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
-    
-
 
 
 class UserSerializer(serializers.ModelSerializer):
