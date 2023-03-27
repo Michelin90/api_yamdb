@@ -55,6 +55,8 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True
     )
+    description = serializers.CharField(required=False)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
