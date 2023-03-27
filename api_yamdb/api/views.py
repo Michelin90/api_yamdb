@@ -11,6 +11,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import Category, Genre, Review, Title, User
+
+from .filters import TitleFilter
 from .permissions import (AdminOrReadOnlyPermission,
                           IsBossOrReadOnlyPermission,
                           AdminPermission)
@@ -19,10 +21,11 @@ from .serializers import (CategorySerializer,
                           GenreSerializer,
                           ReviewSerializer,
                           SignupSerializer,
-                          TitleSerializer,
                           TokenSerializer,
                           UserSerializer,
-                          MeSerializer)
+                          MeSerializer,
+                          TitleReadSerializer,
+                          TitleWriteSerializer)
 from .utils import code_to_email
 
 
@@ -142,11 +145,16 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
-    serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
     permission_classes = [AdminOrReadOnlyPermission]
     pagination_class = PageNumberPagination
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return TitleWriteSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
