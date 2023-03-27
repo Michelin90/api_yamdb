@@ -21,7 +21,8 @@ from .serializers import (CategorySerializer,
                           SignupSerializer,
                           TitleSerializer,
                           TokenSerializer,
-                          UserSerializer,)
+                          UserSerializer,
+                          MeSerializer)
 from .utils import code_to_email
 
 
@@ -77,7 +78,7 @@ class UserViewSet(ModelViewSet):
     pagination_class = PageNumberPagination
     search_fields = ('username', )
     http_method_names = [
-        'get', 'post', 'patch', 'head', 'delete',
+        'head', 'get', 'post', 'patch', 'delete',
     ]
 
     @action(
@@ -87,13 +88,12 @@ class UserViewSet(ModelViewSet):
     )
     def me(self, request):
         if request.method == 'PATCH':
-            serializer = UserSerializer(
+            serializer = MeSerializer(
                 request.user,
                 data=request.data,
                 partial=True,
             )
             if serializer.is_valid():
-                serializer.validated_data['role'] = request.user.role
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(

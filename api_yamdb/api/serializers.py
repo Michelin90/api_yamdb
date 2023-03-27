@@ -59,10 +59,10 @@ class UserSerializer(serializers.ModelSerializer):
             'bio', 'role', 'email'
         ]
 
-    def validate(self, data):
-        if data['username'] == 'me':
+    def validate_username(self, value):
+        if value == 'me':
             raise serializers.ValidationError('Недопустимое имя!')
-        return data
+        return value
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -114,3 +114,14 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Review
+
+
+class MeSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'username', 'first_name', 'last_name',
+            'bio', 'email', 'role',
+        ]
