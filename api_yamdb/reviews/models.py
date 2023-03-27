@@ -73,8 +73,6 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField()
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
-                                 blank=True,
-                                 null=True,
                                  related_name='titles')
     description = models.CharField(max_length=400,
                                    blank=True,

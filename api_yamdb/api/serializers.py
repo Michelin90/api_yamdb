@@ -42,6 +42,19 @@ class TitleSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Genre.objects.all()
     )
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+    def to_representation(self, title):
+        serializer = TitleGetSerializer(title)
+        return serializer.data
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
     description = serializers.CharField(required=False)
     rating = serializers.IntegerField(read_only=True)
 
