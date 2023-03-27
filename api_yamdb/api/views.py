@@ -1,18 +1,19 @@
-from django.conf import settings
-from django.core.mail import send_mail
 from django.db.models import Avg
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, status, views, viewsets
+from rest_framework import status, views, viewsets, mixins, filters
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import Category, Genre, Review, Title, User
-from .permissions import AdminOrReadOnlyPermission, IsBossOrReadOnlyPermission
+from .permissions import (AdminOrReadOnlyPermission,
+                          IsBossOrReadOnlyPermission,
+                          AdminPermission)
 from .serializers import (CategorySerializer,
                           CommentSerializer,
                           GenreSerializer,
@@ -21,15 +22,17 @@ from .serializers import (CategorySerializer,
                           TitleSerializer,
                           TokenSerializer,
                           UserSerializer,)
-from .utils import code_generation
+from .utils import code_to_email
 
 
 class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
-    queryset = Category.objects.all().order_by('id')
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    permission_class = AdminOrReadOnlyPermission
 
 
 class CommentViewSet(ModelViewSet):
@@ -37,6 +40,7 @@ class CommentViewSet(ModelViewSet):
         IsBossOrReadOnlyPermission,
     ]
     serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         review = get_object_or_404(
@@ -55,10 +59,11 @@ class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
-    queryset = Genre.objects.all().order_by('id')
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
+    permission_class = AdminOrReadOnlyPermission
     pagination_class = PageNumberPagination
 
 
@@ -66,7 +71,13 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = 'username'
-    permission_classes = (IsAdminUser,)
+    filter_backends = (filters.SearchFilter,)
+    permission_classes = (AdminPermission,)
+    pagination_class = PageNumberPagination
+    search_fields = ('username', )
+    http_method_names = [
+        'get', 'post', 'patch', 'head', 'delete',
+    ]
 
     @action(
         methods=['GET', 'PATCH'],
@@ -81,6 +92,7 @@ class UserViewSet(ModelViewSet):
                 partial=True,
             )
             if serializer.is_valid():
+                serializer.validated_data['role'] = request.user.role
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(
@@ -94,21 +106,13 @@ class SignupView(views.APIView):
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
+        user = request.data.get('username')
         if serializer.is_valid():
             serializer.save()
-            user = get_object_or_404(
-                User, username=request.data.get('username')
-            )
-            confirmation_code = code_generation()
-            user.confirmation_code = confirmation_code
-            user.save()
-            send_mail(
-                subject='Код подтверждения',
-                message=confirmation_code,
-                recipient_list=[user.email],
-                from_email=settings.EMAIL_HOST_USER,
-                fail_silently=False,
-            )
+            code_to_email(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if User.objects.filter(**QueryDict.dict(request.data)).exists():
+            code_to_email(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -133,16 +137,18 @@ class TokenView(views.APIView):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
-    ).all().order_by('id')
+    ).all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
     permissions = AdminOrReadOnlyPermission
+    pagination_class = PageNumberPagination
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsBossOrReadOnlyPermission,)
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         title = get_object_or_404(

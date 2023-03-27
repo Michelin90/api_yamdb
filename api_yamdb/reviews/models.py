@@ -29,7 +29,7 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(
         'Код подтверждения',
-        max_length=100,
+        max_length=10,
         null=True,
         blank=True,
     )
@@ -153,7 +153,7 @@ class Comment(models.Model):
         verbose_name='отзыв'
     )
     text = models.TextField()
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True,
         db_index=True
