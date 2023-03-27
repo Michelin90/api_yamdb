@@ -1,6 +1,5 @@
-from django.conf import settings
-from django.core.mail import send_mail
 from django.db.models import Avg
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, views, viewsets, mixins, filters
@@ -23,7 +22,7 @@ from .serializers import (CategorySerializer,
                           TitleSerializer,
                           TokenSerializer,
                           UserSerializer,)
-from .utils import code_generation
+from .utils import code_to_email
 
 
 class CategoryViewSet(mixins.ListModelMixin,
@@ -74,6 +73,7 @@ class UserViewSet(ModelViewSet):
     lookup_field = 'username'
     permission_classes = (AdminPermission,)
     pagination_class = PageNumberPagination
+    search_fields = ('username', )
 
     @action(
         methods=['GET', 'PATCH'],
@@ -103,21 +103,13 @@ class SignupView(views.APIView):
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
+        user = request.data.get('username')
         if serializer.is_valid():
             serializer.save()
-            user = get_object_or_404(
-                User, username=request.data.get('username')
-            )
-            confirmation_code = code_generation()
-            user.confirmation_code = confirmation_code
-            user.save()
-            send_mail(
-                subject='Код подтверждения',
-                message=confirmation_code,
-                recipient_list=[user.email],
-                from_email=settings.EMAIL_HOST_USER,
-                fail_silently=False,
-            )
+            code_to_email(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if User.objects.filter(**QueryDict.dict(request.data)).exists():
+            code_to_email(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
