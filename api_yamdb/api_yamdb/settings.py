@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 
@@ -23,8 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'api.apps.ApiConfig',
-    'reviews.apps.ReviewsConfig',
+    'api',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -100,8 +101,39 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+
+# Default user
+
+AUTH_USER_MODEL = 'reviews.User'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+# smpt server
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = 'yamdb_project@mail.ru '
+EMAIL_HOST_PASSWORD = 'iBFcW88cvzLmQprr5SrZ'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
