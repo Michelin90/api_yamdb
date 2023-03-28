@@ -5,6 +5,14 @@ from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Title, User, Review
 
 
+class UserValidateSerializer(serializers.ModelSerializer):
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Недопустимое имя!')
+        return value
+
+
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -63,7 +71,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(UserValidateSerializer):
 
     class Meta:
         model = User
@@ -72,22 +80,12 @@ class UserSerializer(serializers.ModelSerializer):
             'bio', 'role', 'email'
         ]
 
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError('Недопустимое имя!')
-        return value
 
-
-class SignupSerializer(serializers.ModelSerializer):
+class SignupSerializer(UserValidateSerializer):
 
     class Meta:
         model = User
         fields = ['username', 'email']
-
-    def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError('Недопустимое имя!')
-        return data
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -129,7 +127,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
 
 
-class MeSerializer(serializers.ModelSerializer):
+class MeSerializer(UserValidateSerializer):
     role = serializers.CharField(read_only=True)
 
     class Meta:
