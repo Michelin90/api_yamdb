@@ -16,7 +16,7 @@ class User(AbstractUser):
         'Логин',
         unique=True,
         max_length=150,
-        validators=[RegexValidator(regex=r'^[\w.@+-]+$'),],
+        validators=[RegexValidator(regex=r'^[\w.@+-]+$')],
         db_index=True,
     )
     email = models.EmailField(
