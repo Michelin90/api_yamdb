@@ -15,7 +15,7 @@ class IsBossOrReadOnlyPermission(permissions.BasePermission):
                 or request.user.is_admin)
 
 
-class AdminOrReadOnlyPermission(permissions.BasePermission):
+class IsAdminOrReadOnlyPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -25,7 +25,7 @@ class AdminOrReadOnlyPermission(permissions.BasePermission):
                 and request.user.is_admin)
 
 
-class AdminPermission(permissions.BasePermission):
+class IsAdminPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return (

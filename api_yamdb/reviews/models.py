@@ -1,55 +1,16 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import (MinValueValidator,
+                                    MaxValueValidator,)
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 
-
-class User(AbstractUser):
-    USER = 'user'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
-    CHOICES = [
-        (USER, 'пользователь'),
-        (MODERATOR, 'модератор'),
-        (ADMIN, 'админ'),
-    ]
-    email = models.EmailField(
-        'Адрес электронной почты',
-        max_length=254,
-        unique=True
-    )
-    bio = models.TextField(
-        'Биография',
-        blank=True,
-    )
-    role = models.CharField(
-        'Право доступа',
-        max_length=10,
-        choices=CHOICES,
-        default=USER,
-    )
-    confirmation_code = models.CharField(
-        'Код подтверждения',
-        max_length=10,
-        null=True,
-        blank=True,
-    )
-
-    def __str__(self):
-        return self.username
-
-    @property
-    def is_admin(self):
-        return self.role == 'admin' or self.is_superuser
-
-    @property
-    def is_moderator(self):
-        return self.role == 'moderator'
+from user.models import User
 
 
 class Category(models.Model):
     name = models.CharField(max_length=200,
                             unique=True,
-                            verbose_name="Название")
+                            verbose_name="Название",
+                            db_index=True,
+                            )
     slug = models.SlugField(unique=True,
                             verbose_name="Метка",)
 
@@ -60,6 +21,7 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=200,
                             unique=True,
+                            db_index=True,
                             )
     slug = models.SlugField(unique=True)
 
@@ -73,7 +35,8 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField()
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
-                                 related_name='titles')
+                                 related_name='titles',
+                                 null=True)
     description = models.CharField(max_length=400,
                                    blank=True,
                                    null=True)
@@ -100,7 +63,8 @@ class Review(models.Model):
         blank=True,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Произведение'
+        verbose_name='Произведение',
+        db_index=False
     )
     text = models.CharField(
         max_length=200
@@ -109,7 +73,8 @@ class Review(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Автор'
+        verbose_name='Автор',
+        db_index=False
     )
     score = models.IntegerField(
         'Оценка',

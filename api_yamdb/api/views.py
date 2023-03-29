@@ -10,12 +10,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from reviews.models import Category, Genre, Review, Title, User
-
+from reviews.models import Category, Genre, Review, Title
+from user.models import User
 from .filters import TitleFilter
-from .permissions import (AdminOrReadOnlyPermission,
+from .permissions import (IsAdminOrReadOnlyPermission,
                           IsBossOrReadOnlyPermission,
-                          AdminPermission)
+                          IsAdminPermission)
 from .serializers import (CategorySerializer,
                           CommentSerializer,
                           GenreSerializer,
@@ -36,7 +36,7 @@ class CategoryViewSet(mixins.ListModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    permission_classes = [AdminOrReadOnlyPermission]
+    permission_classes = [IsAdminOrReadOnlyPermission]
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
     lookup_field = 'slug'
@@ -70,7 +70,7 @@ class GenreViewSet(mixins.ListModelMixin,
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
-    permission_classes = [AdminOrReadOnlyPermission]
+    permission_classes = [IsAdminOrReadOnlyPermission]
     pagination_class = PageNumberPagination
     lookup_field = 'slug'
 
@@ -80,7 +80,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
-    permission_classes = (AdminPermission,)
+    permission_classes = (IsAdminPermission,)
     pagination_class = PageNumberPagination
     search_fields = ('username', )
     http_method_names = [
@@ -99,12 +99,8 @@ class UserViewSet(ModelViewSet):
                 data=request.data,
                 partial=True,
             )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
@@ -147,7 +143,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     ).all()
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
-    permission_classes = [AdminOrReadOnlyPermission]
+    permission_classes = [IsAdminOrReadOnlyPermission]
     pagination_class = PageNumberPagination
     filterset_class = TitleFilter
 
