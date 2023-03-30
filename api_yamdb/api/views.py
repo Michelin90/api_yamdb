@@ -110,14 +110,13 @@ class SignupView(views.APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         user = request.data.get('username')
-        if serializer.is_valid():
-            serializer.save()
-            code_to_email(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
         if User.objects.filter(**QueryDict.dict(request.data)).exists():
             code_to_email(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.initial_data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        code_to_email(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TokenView(views.APIView):
