@@ -2,30 +2,24 @@ from django.db.models import Avg
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, views, viewsets, mixins, filters
+from rest_framework import filters, mixins, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from reviews.models import Category, Genre, Review, Title
 from user.models import User
+
 from .filters import TitleFilter
-from .permissions import (IsAdminOrReadOnlyPermission,
-                          IsBossOrReadOnlyPermission,
-                          IsAdminPermission)
-from .serializers import (CategorySerializer,
-                          CommentSerializer,
-                          GenreSerializer,
-                          ReviewSerializer,
-                          SignupSerializer,
-                          TokenSerializer,
-                          UserSerializer,
-                          MeSerializer,
-                          TitleReadSerializer,
-                          TitleWriteSerializer)
+from .permissions import (IsAdminOrReadOnlyPermission, IsAdminPermission,
+                          IsBossOrReadOnlyPermission)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, MeSerializer, ReviewSerializer,
+                          SignupSerializer, TitleReadSerializer,
+                          TitleWriteSerializer, TokenSerializer,
+                          UserSerializer)
 from .utils import code_to_email
 
 
